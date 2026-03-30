@@ -1,0 +1,14 @@
+{
+  "name": "aegis402-agent-client",
+  "version": "1.0.0",
+  "description": "Agent Client for Aegis402",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@stellar/stellar-sdk": "^13.0.0",
+    "axios": "^1.6.8",
+    "dotenv": "^16.4.5"
+  }
+}

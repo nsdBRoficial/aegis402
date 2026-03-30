@@ -1,0 +1,15 @@
+{
+  "name": "aegis402-api-provider",
+  "version": "1.0.0",
+  "description": "API Provider for Aegis402 using x402-stellar",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@stellar/stellar-sdk": "^13.0.0",
+    "@x402/stellar": "latest",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2"
+  }
+}
