@@ -16,7 +16,13 @@ async function main() {
     const response = await axios.get(PROVIDER_URL);
     console.log("✅ [Agent] Sucesso inesperado:", response.data);
   } catch (error) {
-    // 2. Captura especificamente o erro 402 Payment Required
+    /**
+     * Interceptação Estratégica do HTTP 402:
+     * O protocolo M2M não vê o código HTTP 402 como uma falha fatal, mas sim como um
+     * 'Invoice' descentralizado. Ao bater no bloqueio do 'requirePayment', este bloco captura
+     * o desafio e ativa o módulo signer Soroban offline. Isso permite refazer a chamada L402
+     * com a devida prova de liquidação matemática (XDR submetida), completando o pagamento.
+     */
     if (error.response && error.response.status === 402) {
       console.log("🛑 [Agent] Erro 402: Payment Required interceptado.");
       

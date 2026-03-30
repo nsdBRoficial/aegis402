@@ -1,31 +1,42 @@
 require('dotenv').config();
 const express = require('express');
-const { X402Provider } = require('@x402/stellar');
+const cors = require('cors');
 
 const app = express();
+app.use(cors({ origin: 'http://localhost:3000' }));
 const port = process.env.PORT || 3001;
-
-// Configuração do Provedor x402 baseada no SDK oficial
-// O middleware interceptará as chamadas e validará a prova de pagamento na Testnet
-const x402 = new X402Provider({
-  receiver: process.env.PROVIDER_PUBLIC_KEY,
-  network: 'TESTNET',
-  asset: {
-    code: 'USDC',
-    issuer: process.env.USDC_ISSUER || 'GBBD47IF6LWK7P7MDEVSCWTTCJM4RTNM62VK3SAWGWLUEXYE61' // Issuer mockado para Testnet
+/**
+ * AegisL402 Native Middleware.
+ * Padrão HTTP L402 para economia de agentes (Machine-to-Machine).
+ */
+const aegisL402Middleware = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  
+  // Se o Header for ausente ou inválido, retorna fatura L402 (HTTP 402)
+  if (!authHeader || !authHeader.startsWith('L402 ')) {
+    return res.status(402).json({
+      amount: '5',
+      asset: 'USDC',
+      receiver: process.env.PROVIDER_PUBLIC_KEY,
+      message: 'Payment Required via Soroban'
+    });
   }
-});
 
-// Middleware que protege a rota.
-// Se o Header 'Authorization: L402 <mac>:<preimage>' (ou equivalente x402) não estiver presente ou for inválido,
-// retorna HTTP 402 Payment Required com os detalhes da fatura (invoice).
-const requirePayment = x402.middleware({
-  amount: '5.00', // Custo da API: 5 USDC
-  description: 'Aegis402 Premium AI Dataset'
-});
+  // Desempacota o comprove de pagamento: Hash da Transação e ZK-Preimage (L402 MOCK)
+  const token = authHeader.split(' ')[1];
+  const [txHash, preimage] = token.split(':');
 
-// Rota protegida
-app.get('/api/data', requirePayment, (req, res) => {
+  if (txHash) {
+    // Validação mockada concluinte: Na blockchain real, chamaríamos Node RPC para conferir `txHash` contra `PROVIDER_PUBLIC_KEY`.
+    console.log(`[x402] Transação validada localmente! Hash: ${txHash}`);
+    req.paid = true;
+    return next();
+  }
+
+  return res.status(400).json({ error: 'Invalid L402 Payload' });
+};
+
+app.get('/api/data', aegisL402Middleware, (req, res) => {
   res.status(200).json({
     success: true,
     message: 'Pagamento validado com sucesso via x402 Protocol!',

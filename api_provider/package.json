@@ -9,6 +9,7 @@
   "dependencies": {
     "@stellar/stellar-sdk": "^13.0.0",
     "@x402/stellar": "latest",
+    "cors": "^2.8.6",
     "dotenv": "^16.4.5",
     "express": "^4.21.2"
   }
