@@ -9,6 +9,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { Keypair, TransactionBuilder, Networks, Contract, rpc, xdr, Account, Address, scValToNative } from '@stellar/stellar-sdk';
 import axios from 'axios';
 import { orchestratePaymentFallback } from './services/payment_orchestrator';
+import { initMppClient, updateMppLogCallback } from './services/mpp_client';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const FLEET_AGENTS = [
@@ -96,6 +97,16 @@ export default function App() {
   };
 
   useEffect(() => {
+    const agentSk = import.meta.env.VITE_AGENT_SECRET_KEY;
+    // Initialize the global Mppx singleton BEFORE any fetch fires.
+    // This ensures the L402 interceptor is patched to global fetch at App load.
+    initMppClient(agentSk, (msg) => {
+      setAuditLogs(prev => [...prev, {
+        type: 'SYSTEM',
+        message: msg,
+        timestamp: new Date().toLocaleTimeString('en-US', { hour12: false })
+      }]);
+    });
     fetchBalances();
   }, []);
 
@@ -224,6 +235,9 @@ export default function App() {
        if (msg.includes("Hash: ")) latestHash = msg.split("Hash: ")[1].trim();
        logAudit('SYSTEM', msg.replace('> ', ''));
     };
+    
+    // Route SDK progress events (onProgress) to this agent's log
+    updateMppLogCallback(logOrch);
     
     // Reduces limit temporarily to simulate local tracking (In production, contract does this)
     setLimits(prev => ({...prev, [agentId]: prev[agentId] - tool.cost}));
