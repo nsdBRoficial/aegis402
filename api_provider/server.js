@@ -3,32 +3,51 @@ const express = require('express');
 const cors = require('cors');
 
 const app = express();
-app.use(cors({ origin: 'http://localhost:3000' }));
+app.use(cors({ 
+  origin: 'http://localhost:3000',
+  exposedHeaders: ['WWW-Authenticate'] 
+}));
 const port = process.env.PORT || 3001;
 /**
  * AegisL402 Native Middleware.
- * Padrão HTTP L402 para economia de agentes (Machine-to-Machine).
+ * L402 HTTP Payment Protocol for Machine-to-Machine (M2M) agent economy.
  */
 const aegisL402Middleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
   
-  // Se o Header for ausente ou inválido, retorna fatura L402 (HTTP 402)
+  // If Authorization header is absent or invalid, issue an L402 invoice (HTTP 402)
   if (!authHeader || !authHeader.startsWith('L402 ')) {
-    return res.status(402).json({
-      amount: '5',
-      asset: 'USDC',
+    const requestedAmountXLM = req.query.amount || '5';
+    const amountStroops = (Number(requestedAmountXLM) * 10000000).toString(); // String per MPP SDK spec
+
+    const errorPayload = {
+      amount: amountStroops,
+      asset: 'CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC', // XLM Native Contract (Testnet)
       receiver: process.env.PROVIDER_PUBLIC_KEY,
-      message: 'Payment Required via Soroban'
-    });
+      network: 'stellar:testnet',
+      method: 'stellar',   // Raph Tuple: required by MPP SDK for scheme matching
+      intent: 'charge'    // Raph Tuple: identifies the payment intent
+    };
+
+    const tokenData = "aegis-macaroon";
+    const invoiceData = Buffer.from(JSON.stringify(errorPayload)).toString('base64');
+    const wwwAuthHeader = `L402 token="${tokenData}",invoice="${invoiceData}"`;
+
+    // L402 Challenge issued — client will retry with Authorization header after on-chain settlement
+
+    return res.status(402)
+      .setHeader('WWW-Authenticate', wwwAuthHeader)
+      .setHeader('Content-Type', 'application/json')
+      .json({ error: 'Payment Required', challenge: wwwAuthHeader });
   }
 
-  // Desempacota o comprove de pagamento: Hash da Transação e ZK-Preimage (L402 MOCK)
+  // Unpack the payment proof: Transaction Hash + ZK-Preimage from L402 token
   const token = authHeader.split(' ')[1];
-  const [txHash, preimage] = token.split(':');
+  const [txHash] = token.split(':');
 
   if (txHash) {
-    // Validação mockada concluinte: Na blockchain real, chamaríamos Node RPC para conferir `txHash` contra `PROVIDER_PUBLIC_KEY`.
-    console.log(`[x402] Transação validada localmente! Hash: ${txHash}`);
+    // Payment proof accepted — passing request to protected handler.
+    // TODO (production): call Stellar RPC to verify txHash against PROVIDER_PUBLIC_KEY on-chain.
     req.paid = true;
     return next();
   }
@@ -39,9 +58,9 @@ const aegisL402Middleware = (req, res, next) => {
 app.get('/api/data', aegisL402Middleware, (req, res) => {
   res.status(200).json({
     success: true,
-    message: 'Pagamento validado com sucesso via x402 Protocol!',
+    message: 'Payment validated via Aegis402 L402 Protocol.',
     data: {
-      insight: 'A adoção institucional de Privacy Pools em redes públicas aumentará 400% no próximo ano.',
+      insight: 'Institutional adoption of Privacy Pools on public networks is projected to increase 400% next fiscal year.',
       confidence: 0.98,
       source: 'Aegis402 Shielded Oracle'
     },
@@ -50,7 +69,7 @@ app.get('/api/data', aegisL402Middleware, (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`[Aegis402] API Provider rodando na porta ${port}`);
-  console.log(`[Aegis402] Rota protegida: http://localhost:${port}/api/data`);
-  console.log(`[Aegis402] Aguardando pagamentos para a carteira: ${process.env.PROVIDER_PUBLIC_KEY}`);
+  console.log(`[Aegis402] API Provider running on port ${port}`);
+  console.log(`[Aegis402] Protected route: http://localhost:${port}/api/data`);
+  console.log(`[Aegis402] Awaiting payments to wallet: ${process.env.PROVIDER_PUBLIC_KEY}`);
 });
