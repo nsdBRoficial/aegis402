@@ -34,7 +34,8 @@ export async function orchestratePaymentFallback({
     });
   } catch (error: any) {
     const reason = error?.message ?? String(error);
-    log(`> [DEBUG] MPP V2 Handshake failed. Reason: ${reason}. Activating Aegis-Native Resiliency...`);
+    log(`> [STANDARD V2] Protocol handshake rejected by SDK. Transitioning to Aegis-Native (V1) Resiliency Layer...`);
+    log(`> [DEBUG] V2 Failure Reason: ${reason}`);
     log('> 🛡️ Triggering Aegis-Native Redundancy (V1).');
     
     // Absolute fallback: Aegis-Native V1 (Custom Soroban)
