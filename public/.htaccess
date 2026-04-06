@@ -1,0 +1,15 @@
+# Aegis402 — SPA Routing for Hostinger
+# Redireciona todas as rotas para index.html para que o React Router funcione corretamente.
+# Redirects all routes to index.html so React client-side routing works on Hostinger.
+
+Options -MultiViews
+RewriteEngine On
+
+# Não redirecionar arquivos ou diretórios que existam fisicamente
+# Do not redirect existing files or directories (JS, CSS, images, etc.)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Redireciona qualquer rota desconhecida para index.html (SPA fallback)
+# Redirect all unknown routes to index.html (SPA fallback)
+RewriteRule ^ index.html [L]

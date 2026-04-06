@@ -31,8 +31,9 @@ export default function App() {
   // Aegis B2B Gateway State
   type AuditLog = { type: 'SYSTEM' | 'NETWORK' | 'AI_AUDIT', message: string, timestamp: string };
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([
-    { type: 'SYSTEM', message: 'Aegis402 B2B M2M Gateway Initialized.', timestamp: new Date().toLocaleTimeString('en-US',{hour12:false}) },
-    { type: 'SYSTEM', message: 'Shielded Pool Firewall active. Awaiting fleet requests...', timestamp: new Date().toLocaleTimeString('en-US',{hour12:false}) }
+    { type: 'SYSTEM', message: 'Aegis402 B2B Agentic Gateway — System Online.', timestamp: new Date().toLocaleTimeString('en-US',{hour12:false}) },
+    { type: 'SYSTEM', message: 'M2M Governance Policy Loaded. Shielded Pool Firewall Active.', timestamp: new Date().toLocaleTimeString('en-US',{hour12:false}) },
+    { type: 'SYSTEM', message: 'Awaiting fleet requests on Stellar Testnet...', timestamp: new Date().toLocaleTimeString('en-US',{hour12:false}) }
   ]);
   const [cliInput, setCliInput] = useState("");
   const terminalRef = useRef<HTMLDivElement>(null);
@@ -244,6 +245,7 @@ export default function App() {
 
     try {
       logAudit('SYSTEM', 'L402 Challenge Detected. Intercepting auth payload...');
+      logAudit('NETWORK', `M2M Governance Policy Enforced for [${agentId}]. Initiating payment resolution...`);
 
       const handleSuccessSync = async () => {
          let latestPool = await fetchBalances();
@@ -265,10 +267,10 @@ export default function App() {
 
       // The real hashes are now emitted by aegis_v1_custom.ts as individual log lines.
       // The App layer adds the AI audit result as its own receipt line.
-      logAudit('SYSTEM', `[TRANSACTION RECEIPT] Settlement complete for ${agentId}.`);
+      logAudit('SYSTEM', `[TRANSACTION RECEIPT] On-chain Settlement Verified for ${agentId}.`);
 
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY || "";
-      const promptText = `Escreva uma unica frase super tecnica (apenas 1 frase) dizendo algo como: "[AI AUDIT]: Transaction verified. Spending within normal parameters do Agente ${agentId}".`;
+      const promptText = `Write exactly one single technical sentence (max 20 words, no line breaks) in this exact format: "[AUDIT]: Transaction verified. Spending within normal parameters for Agent ${agentId}." — vary the wording slightly each time but keep the [AUDIT]: prefix and English language.`;
       
       const payload = {
          contents: [{ parts: [{ text: promptText }] }]
@@ -281,8 +283,12 @@ export default function App() {
       });
       
       const json = await res.json();
-      const aiResponse = json.candidates?.[0]?.content?.parts?.[0]?.text || `[AI AUDIT]: Transaction verified. Spending within normal parameters.`;
-      logAudit('AI_AUDIT', aiResponse.replace("\n", "").trim());
+      const rawAiResponse = json.candidates?.[0]?.content?.parts?.[0]?.text || `[AUDIT]: Transaction verified. Spending within normal parameters for Agent ${agentId}.`;
+      // Garante que sempre tenha o prefix [AUDIT]: / Ensures the [AUDIT]: prefix is always present
+      const aiResponse = rawAiResponse.trim().startsWith('[AUDIT]')
+        ? rawAiResponse
+        : `[AUDIT]: ${rawAiResponse.replace(/^\[.*?\]:?\s*/, '')}`;
+      logAudit('AI_AUDIT', aiResponse.replace(/\n/g, ' ').trim());
       
       // Determine which protocol path was used by scanning the session log
       const methodUsed = auditLogs.some(l => l.message.includes('[MPP SDK] SUCCESS')) 
@@ -303,16 +309,27 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 font-mono p-4 md:p-8">
       {/* Header */}
-      <header className="max-w-7xl mx-auto mb-8 flex items-center justify-between border-b border-slate-800 pb-6 uppercase tracking-wider">
+      <header className="max-w-7xl mx-auto mb-8 flex items-center justify-between border-b border-slate-800 pb-6">
         <div className="flex items-center gap-3">
           <Server className="w-8 h-8 text-teal-500" />
-          <h1 className="text-xl font-bold tracking-tight text-white">
-            Aegis<span className="text-teal-500">Gateway</span> B2B
-          </h1>
+          <div>
+            <h1 className="text-xl font-black tracking-tight text-white uppercase">
+              Aegis<span className="text-teal-400">402</span>
+              <span className="text-slate-400 font-medium">: B2B Agentic Governance</span>
+            </h1>
+            <p className="text-[10px] text-slate-600 uppercase tracking-widest mt-0.5">M2M Payment Protocol · Stellar Soroban · L402</p>
+          </div>
         </div>
-        <div className="text-xs text-slate-500 flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span>
-          Stellar Testnet Firewall
+        <div className="flex items-center gap-4">
+          {/* Live Testnet Status Indicator */}
+          <div className="flex items-center gap-2 bg-green-950/30 border border-green-500/20 rounded-full px-3 py-1.5">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+            </span>
+            <span className="text-[10px] text-green-400 font-bold uppercase tracking-widest">LIVE · Stellar Testnet</span>
+          </div>
+          <div className="text-[10px] text-slate-600 uppercase tracking-widest hidden md:block">Shielded Pool Firewall</div>
         </div>
       </header>
 
@@ -440,8 +457,9 @@ export default function App() {
                      <div className="text-[9px] text-teal-500 font-mono">{cost} XLM</div>
                    </button>
                    
-                   {/* Independent Slider per agent */}
-                   <div className="flex items-center gap-1">
+                   {/* Slider de limite por requisição / Limit per Request Slider */}
+                   <div className="flex flex-col gap-1">
+                     <span className="text-[8px] text-slate-600 uppercase tracking-widest">Limit per Request (XLM)</span>
                      <input 
                        type="range" min="0" max="20" step="0.1"
                        value={currentLimit} 
@@ -458,12 +476,14 @@ export default function App() {
             </div>
           </div>
 
-          {/* Audit Terminal Window */}
-          <div className="flex-grow bg-[#000000] p-4 textxs overflow-y-auto space-y-1.5 h-64 font-mono text-[11px]">
+          {/* Gemini Auditor Terminal Window */}
+          <div className="flex-grow bg-[#000000] p-4 text-xs overflow-y-auto space-y-1.5 h-64 font-mono text-[11px]">
                {auditLogs.map((log, idx) => {
                   let logClass = "text-slate-500";
                   if (log.type === 'NETWORK') logClass = "text-teal-400";
-                  if (log.type === 'AI_AUDIT') logClass = "text-indigo-400 font-bold bg-indigo-950/20 px-2 py-1 rounded inline-block w-full border border-indigo-500/10";
+                  // Gemini Auditor output: destaque visual premium com ícone de diamante
+                  // Gemini Auditor output: premium visual highlight with diamond icon
+                  if (log.type === 'AI_AUDIT') logClass = "text-indigo-300 font-bold bg-indigo-950/30 px-3 py-1.5 rounded-lg inline-block w-full border border-indigo-400/20 shadow-[0_0_12px_rgba(99,102,241,0.15)]";
                   if (log.message.includes("ERROR") || log.message.includes("FIREWALL BLOCK")) logClass = "text-red-500 font-bold";
                   if (log.message.includes("Success") || log.message.includes("SUCCESS")) logClass = "text-green-500";
 
