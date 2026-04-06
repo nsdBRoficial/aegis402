@@ -1,60 +1,46 @@
-# PITCH SCRIPT: Aegis402 B2B M2M Gateway
-
-## Tema Central
-Aegis402 não é apenas uma carteira ou um chatbot. É um **Gateway de Infraestrutura B2B (M2M Payment Firewall)** desenhado para aprovar microtransações autônomas (via protocolo L402) em redes fechadas/pools de agentes (Testnet Soroban) com Zero-Knowledge.
+# Aegis402 MVP 2.0: Privacy & Governance Edition
+## Hackathon Pitch Script
 
 ---
 
-### [00:00 - 00:30] A Dores Atuais do M2M
-**Fala:**
-"Hoje, se sua empresa opera cinco Agentes de IA que consomem APIs pagas autonomamente, gerenciar os pagamentos web3 desses agentes é um caos. Se o Agente 01 enlouquecer, ele drena toda a carteira da empresa. Conectamos o Aegis402 para resolver esse risco sistêmico."
+### 🇧🇷 Versão em Português (PT-BR)
 
-**Ação:**
-- Mostre o Painel da Tesouraria Corporativa (Esquerda). Destaque os **9 milhões de XLM** da Company e o *Shielded Pool Balance*.
-- "O orçamento da frota não fica exposto. Ele fica em um Smart Contract selado (Aegis Pool), nutrido estrategicamente."
+**[Abertura e Problema]**
+"A economia do futuro não é B2B nem B2C; é Machine-to-Machine (M2M). Mas agentes de Inteligência Artificial não têm contas bancárias, e tesourarias corporativas não podem simplesmente entregar chaves privadas com saldos ilimitados na mão de instâncias efêmeras na nuvem. Como agentes compram dados e serviços de outros agentes de forma segura e auditável?"
 
----
+**[Apresentando o Aegis402]**
+"Apresentamos o Aegis402, um Firewall de Pagamentos B2B M2M na rede Stellar com Soroban. Ele unifica o protocolo web HTTP 402 com Smart Contracts para criar 'Privacy Pools' para frotas de IA."
 
-### [00:30 - 01:15] A Demonstração do Firewall Rate Limit
-**Fala:**
-"Aqui no painel direito, temos a nossa frota de Agentes simulados. E aqui mora o Firewall. Reduzo o limite do Alpha DataNode para quase Zero..."
+**[A Demo: O Shielded Pool]**
+"Aqui está como funciona:
+1. O Tesouro Corporativo deposita fundos na rede Stellar dentro do nosso Aegis Shielded Pool. Em vez de criar milhares de carteiras secundárias, usamos Hashes ZK-Commitment. O capital fica isolado da conta matriz.
+2. Quando nosso *Fleet Agent* tenta comprar um *Insight de Dados* em um terminal API de outro provedor, a requisição é bloqueada nativamente por um middleware Vercel L402. O sistema exige pagamento.
+3. O Agente, de forma totalmente autônoma, invoca o contrato Aegis Pool no Soroban. Ele entrega a contra-prova criptográfica (o preimage)."
 
-**Ação:**
-- Deslize o slider do **Alpha DataNode** para um valor menor que 5 XLM.
-- Mostre o card brilhando em vermelho: `FIREWALL ACTIVE`.
-- **Clique** no botão de simulação do Alpha DataNode.
-- **Destaque:** O clique falhará instantaneamente e gerará o log: `[FIREWALL] Transaction blocked...`
-- **Fala:** "Ele tentou gastar sozinho sem saldo no limite corporativo. O nosso gateway B2B o intercepta antes mesmo de alcançar a rede."
+**[Liquidação e Privacidade]**
+"O contrato no Soroban resolve a transação. O diferencial? A privacidade. O fornecedor de dados apenas vê o valor chegando do 'Pool'. Ele nunca descobre o verdadeiro dono do capital. O endereço corporativo é mascarado. Além disso, no momento que a transação é processada on-chain e os fundos roteados, o gateway desbloqueia a API e nosso Agente extrai as predições."
 
----
-
-### [01:15 - 02:00] A Execução Perfeita (Protocolo Híbrido MPP + V1)
-**Fala:**
-"Agora, damos um orçamento decente ao Zeta Reasoner e ele detecta uma demanda..."
-
-**Ação:**
-- Deslize o limite do **Zeta Reasoner** acima de 10 XLM.
-- **Clique** em simular "AI Reasoning".
-- Mostre a mágica no *Security & Payment Audit Log*. Ele vai disparar o L402 Challenge, bater no Orchestrator, assinar na Soroban e confirmar a transação.
-- **Fala:** "Em um milissegundo, a requisição sofre M2M Shielding, paga via Testnet e cai no log. Clicando no Hash em azul/ciano, vocês podem ver o selo holográfico diretamente na Stellar Expert."
-- **Ação:** Clique no link do Hash gerado.
+**[Auditoria em Tempo Real]**
+"Ainda criamos uma camada de auditoria Gemini integrada: O LLM emite pareceres técnicos instantâneos atestando o compliance do handshake M2M, todos atrelados a um hash público no Stellar. Isso é o MVP 2.0 do Aegis402 — M2M veloz, infraestrutura descentralizada e conformidade by-design."
 
 ---
 
-### [02:00 - 02:30] O Pulo do Gato: IA Auditora
-**Fala:**
-"Mas orquestrar pagamentos não é o suficiente em B2B. O quão auditável é isso? Adicionamos a mente do Gemini por trás da blockchain operando como nosso 'Aegis Auditor'."
+### 🇺🇸 English Version (EN)
 
-**Ação:**
-- Mostre a última linha azul arroxeada no log, a tag `[AI AUDIT]`.
-- **Fala:** "O Gemini recebe assincronamente os meta-dados transacionais liquidadores da Soroban e elabora compliance logs em tempo real sem expor o payload bruto. Nós conectamos a auditoria da IA Generativa na pipeline transacional M2M!"
+**[Opening & Problem]**
+"The economy of the future isn’t B2B or B2C; it’s Machine-to-Machine (M2M). But AI agents don’t have bank accounts, and corporate treasuries can’t hand over private keys with infinite balances to ephemeral cloud instances. So how do agents buy data and services from other agents securely and auditably?"
 
----
+**[Introducing Aegis402]**
+"Enter Aegis402, a B2B M2M Payment Firewall built on the Stellar network with Soroban. It unifies the HTTP 402 web protocol with Smart Contracts to create 'Privacy Pools' for AI fleets."
 
-### [02:30 - 03:00] Compliance & Encerramento
-**Fala:**
-"No final do mês fiscal, a transparência B2B é obrigatória. Um clique aqui exporta o balanço de toda a rede criptografada."
+**[The Demo: The Shielded Pool]**
+"Here is how it works:
+1. The Corporate Treasury deposits funds on the Stellar network into our Aegis Shielded Pool. Instead of fielding thousands of sub-wallets, it uses ZK-Commitment Hashes. Capital is isolated from the master account.
+2. When our *Fleet Agent* tries to buy a *Data Insight* from a provider's API, the request is actively blocked by a Vercel L402 middleware. The system demands payment.
+3. The Agent, fully autonomously, invokes the Aegis Pool Soroban contract. It reveals the cryptographic counter-proof (the preimage)."
 
-**Ação:**
-- **Clique no íncone de Download** acima da janela do Log. Mostre que o arquivo `.txt` é gerado.
-- "Aegis402. Seguro. Híbrido. Feito com Google AI e a velocidade imbatível da Stellar. Obrigado."
+**[Settlement and Privacy]**
+"The Soroban contract settles the transaction. The game-changer? Privacy. The data provider only sees funds arriving from the 'Pool'. They never trace it back to the true capital owner. The corporate master address is completely shielded and masked. Once the funds route on-chain, the gateway unlocks the API, and our Agent extracts the predictions."
+
+**[Real-time Auditing]**
+"We also built an integrated Gemini compliance layer: The LLM streams instant technical assessments validating the M2M handshake, permanently anchored to a public Stellar transaction hash. This is Aegis402 MVP 2.0 — blistering fast M2M, decentralized infrastructure, and compliance by-design."

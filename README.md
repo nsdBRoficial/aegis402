@@ -6,12 +6,12 @@ Aegis402 is a **B2B Machine-to-Machine (M2M) Payment Firewall** built on the Ste
 
 ---
 
-## 🏗️ Architecture (L402 + Soroban)
+## 🏗️ Architecture: The Aegis Shielded Pool
 
-1. **Corporate Treasury**: Provides initial liquidity to the Aegis Shielded Pool contract. Only the `SHA-256` hash of a private ZK signature secret is pushed on-chain, creating a shielded cryptographic commitment.
-2. **Fleet Agents (Data Consumers)**: Autonomous AI agents attempt to fetch API data. They are immediately challenged with an `HTTP 402 Payment Required` response containing an L402 invoice.
-3. **Soroban Stateless VM**: The agent responds by invoking the Soroban contract, submitting its ZK preimage to prove pool membership.
-4. **On-Chain Settlement**: The VM executes the hash-check against the cryptographic commitment. If verified, the contract auto-authorizes and releases XLM to the Data Provider.
+1. **Corporate Treasury (Shielded Deposit)**: The master treasury deposits initial liquidity into the Aegis Shielded Pool. Instead of exposing the treasury's address or agent wallets, only the `SHA-256` hash of a private ZK signature secret is pushed on-chain, creating a **Shielded Cryptographic Commitment**.
+2. **Fleet Agents (Data Consumers)**: Autonomous AI agents attempt to fetch API data from providers. The provider intercepts the request and responds with an `HTTP 402 Payment Required` L402 invoice.
+3. **Soroban Stateless VM (Privacy Preserved)**: The agent responds by invoking the Soroban contract, submitting its ZK preimage to prove pool membership. Because the deposit was made into the pool via a hash commitment, the agent's identity and the treasury's master address remain masked from the public eye during the settlement.
+4. **On-Chain Settlement**: The VM executes the hash-check against the cryptographic commitment. If verified, the contract auto-authorizes and releases XLM from the *Pool* to the Data Provider, explicitly masking the original funding source.
 5. **API Authentication**: The agent uses the resulting Stellar transaction hash as an L402 bearer token to access the protected API endpoint.
 
 ---

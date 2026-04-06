@@ -51,13 +51,15 @@ impl AegisPool {
     ///
     /// PT-BR: O agente revela o `secret` (preimage). O contrato recalcula o SHA-256,
     /// localiza o saldo no pool shielded e transfere o valor ao `provider`.
-    /// Este é o mecanismo de liquidação nativa do Aegis402 — sem necessidade de
-    /// custódia centralizada: a prova criptográfica é a autorização.
+    /// PRIVACIDADE: Este método mascara a carteira do tesouro corporativo.
+    /// O provider apenas recebe fundos do "Pool", e a prova criptográfica do agente
+    /// garante a autorização da despesa sem expor a origem do capital.
     ///
     /// EN: The agent reveals the `secret` (preimage). The contract recomputes SHA-256,
     /// locates the balance in the shielded pool, and transfers the amount to the `provider`.
-    /// This is the Aegis402 native settlement mechanism — no centralized custody needed:
-    /// the cryptographic proof IS the authorization.
+    /// PRIVACY: This method masks the corporate treasury wallet.
+    /// The provider only receives funds from the "Pool", and the agent's cryptographic
+    /// proof guarantees expense authorization without exposing the capital origin.
     pub fn pay(env: Env, secret: BytesN<32>, provider: Address, token_address: Address, amount: i128) {
         // Reconstrói o commitment a partir do preimage secreto do agente
         // Reconstructs the commitment from the agent's secret preimage
